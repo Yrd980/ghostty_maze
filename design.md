@@ -8,8 +8,7 @@
 - **前端框架**: React 18 + TypeScript
 - **构建工具**: Vite
 - **样式**: Tailwind CSS v4
-- **渲染**: Canvas 2D API
-- **音频**: Web Audio API (待实现)
+- **渲染**: Canvas 2D API **音频**: Web Audio API (待实现)
 
 ---
 

@@ -47,6 +47,18 @@ export const FLASHLIGHT_CONFIG = {
   SHAKE_MAX: 8,             // 最大抖动角度
 };
 
+// 道具配置
+export const ITEM_CONFIG = {
+  BATTERY_RESTORE: 50,      // 电池恢复量
+  MEDKIT_HEAL: 30,          // 医疗包恢复量
+  PICKUP_RADIUS: 20,        // 拾取半径（像素）
+  ITEM_SIZE: 12,            // 道具显示大小
+  // 生成数量
+  BATTERY_COUNT: 3,
+  MEDKIT_COUNT: 2,
+  KEY_COUNT: 3,
+};
+
 // Canvas 配置
 export const CANVAS_CONFIG = {
   WIDTH: MAZE_CONFIG.WIDTH * MAZE_CONFIG.CELL_SIZE,

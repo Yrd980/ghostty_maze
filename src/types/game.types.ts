@@ -62,3 +62,31 @@ export interface Flashlight {
   drainRate: number;       // 消耗速度（每秒）
   shake: number;           // 当前抖动角度
 }
+
+// 道具类型
+export enum ItemType {
+  BATTERY = 'battery',      // 电池
+  MEDKIT = 'medkit',        // 医疗包
+  KEY = 'key',              // 钥匙
+  JAMMER = 'jammer',        // 干扰器
+}
+
+// 道具实体
+export interface Item {
+  id: string;
+  type: ItemType;
+  position: Vector2;
+  isCollected: boolean;
+}
+
+// 库存槽位
+export interface InventorySlot {
+  item: ItemType | null;
+  count: number;
+}
+
+// 玩家库存
+export interface Inventory {
+  slots: InventorySlot[];
+  maxSlots: number;
+}

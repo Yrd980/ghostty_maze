@@ -3,12 +3,15 @@ import { GameCanvas } from './GameCanvas';
 import { HeartRateDisplay } from './UI/HeartRateDisplay';
 import { DebugPanel } from './UI/DebugPanel';
 import { BatteryDisplay } from './UI/BatteryDisplay';
+import { InventoryDisplay } from './UI/InventoryDisplay';
 import { MazeGenerator } from '../systems/MazeGenerator';
 import { CollisionSystem } from '../systems/CollisionSystem';
+import { ItemSystem } from '../systems/ItemSystem';
 import { FlashlightController } from '../managers/FlashlightController';
 import { useKeyboard } from '../hooks/useKeyboard';
-import type { Maze, Player, Flashlight } from '../types/game.types';
-import { PLAYER_CONFIG, HEARTRATE_CONFIG } from '../constants/game.constants';
+import type { Maze, Player, Flashlight, Item, Inventory } from '../types/game.types';
+import { ItemType } from '../types/game.types';
+import { PLAYER_CONFIG, HEARTRATE_CONFIG, ITEM_CONFIG } from '../constants/game.constants';
 
 export function Game() {
   const [maze, setMaze] = useState<Maze | null>(null);
@@ -24,11 +27,22 @@ export function Game() {
   const [fps, setFps] = useState(60);
   const [bpm, setBpm] = useState(HEARTRATE_CONFIG.BASE_BPM);
   const [flashlight, setFlashlight] = useState<Flashlight | null>(null);
+  const [items, setItems] = useState<Item[]>([]);
+  const [inventory, setInventory] = useState<Inventory>({
+    slots: [
+      { item: null, count: 0 },
+      { item: null, count: 0 },
+      { item: null, count: 0 },
+      { item: null, count: 0 },
+    ],
+    maxSlots: 4,
+  });
 
   const keysRef = useKeyboard();
   const lastTimeRef = useRef<number>(0);
   const fpsCounterRef = useRef({ frames: 0, lastTime: 0 });
   const flashlightControllerRef = useRef<FlashlightController | null>(null);
+  const itemSystemRef = useRef<ItemSystem | null>(null);
   const lastFlashlightKeyRef = useRef(false);
 
   // 生成迷宫
@@ -37,12 +51,69 @@ export function Game() {
     const newMaze = generator.generate();
     setMaze(newMaze);
 
+    // 生成道具
+    if (!itemSystemRef.current) {
+      itemSystemRef.current = new ItemSystem();
+    }
+    const newItems = itemSystemRef.current.generateItems(newMaze);
+    setItems(newItems);
+
     // 设置玩家初始位置
     setPlayer((prev) => ({
       ...prev,
       position: { ...newMaze.startPos },
     }));
   }, []);
+
+  // 处理道具拾取
+  const handleItemPickup = (item: Item) => {
+    switch (item.type) {
+      case ItemType.BATTERY:
+        // 恢复手电筒电量
+        if (flashlightControllerRef.current) {
+          flashlightControllerRef.current.rechargeBattery(ITEM_CONFIG.BATTERY_RESTORE);
+        }
+        break;
+
+      case ItemType.MEDKIT:
+        // 恢复生命值
+        setPlayer((prev) => ({
+          ...prev,
+          health: Math.min(PLAYER_CONFIG.MAX_HEALTH, prev.health + ITEM_CONFIG.MEDKIT_HEAL),
+        }));
+        break;
+
+      case ItemType.KEY:
+      case ItemType.JAMMER:
+        // 添加到库存
+        addToInventory(item.type);
+        break;
+    }
+  };
+
+  // 添加道具到库存
+  const addToInventory = (itemType: ItemType) => {
+    setInventory((prev) => {
+      const newSlots = [...prev.slots];
+
+      // 查找已有相同道具的槽位
+      const existingIndex = newSlots.findIndex((slot) => slot.item === itemType);
+      if (existingIndex !== -1) {
+        newSlots[existingIndex].count++;
+        return { ...prev, slots: newSlots };
+      }
+
+      // 查找空槽位
+      const emptyIndex = newSlots.findIndex((slot) => slot.item === null);
+      if (emptyIndex !== -1) {
+        newSlots[emptyIndex] = { item: itemType, count: 1 };
+        return { ...prev, slots: newSlots };
+      }
+
+      // 库存已满
+      return prev;
+    });
+  };
 
   // 初始化
   useEffect(() => {
@@ -168,6 +239,15 @@ export function Game() {
         setFlashlight(flashlightControllerRef.current.getState());
       }
 
+      // 检测道具拾取
+      if (itemSystemRef.current) {
+        const pickedItem = itemSystemRef.current.checkPickup(player.position);
+        if (pickedItem) {
+          handleItemPickup(pickedItem);
+          setItems([...itemSystemRef.current.getItems()]);
+        }
+      }
+
       animationId = requestAnimationFrame(gameLoop);
     };
 
@@ -225,7 +305,7 @@ export function Game() {
       </div>
 
       {/* 游戏画布 */}
-      <GameCanvas maze={maze} player={player} flashlight={flashlight} />
+      <GameCanvas maze={maze} player={player} flashlight={flashlight} items={items} />
 
       {/* 控制按钮 */}
       <div className="flex gap-4">
@@ -248,6 +328,11 @@ export function Game() {
           <div>Shift - Sprint</div>
           <div>F - Toggle Flashlight</div>
         </div>
+      </div>
+
+      {/* 库存显示 */}
+      <div className="fixed top-4 right-4">
+        <InventoryDisplay inventory={inventory} />
       </div>
     </div>
   );

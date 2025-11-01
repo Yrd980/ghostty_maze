@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import type { Maze, Player, Flashlight } from '../types/game.types';
+import type { Maze, Player, Flashlight, Item } from '../types/game.types';
 import { RenderSystem } from '../systems/RenderSystem';
 import { FlashlightController } from '../managers/FlashlightController';
 import { CANVAS_CONFIG } from '../constants/game.constants';
@@ -8,9 +8,10 @@ interface GameCanvasProps {
   maze: Maze;
   player: Player;
   flashlight?: Flashlight | null;
+  items?: Item[];
 }
 
-export function GameCanvas({ maze, player, flashlight }: GameCanvasProps) {
+export function GameCanvas({ maze, player, flashlight, items }: GameCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const renderSystemRef = useRef<RenderSystem | null>(null);
   const flashlightControllerRef = useRef<FlashlightController | null>(null);
@@ -39,8 +40,14 @@ export function GameCanvas({ maze, player, flashlight }: GameCanvasProps) {
       );
     }
 
-    renderSystemRef.current.render(maze, player, flashlight || undefined, shakeDirection);
-  }, [maze, player, flashlight]);
+    renderSystemRef.current.render(
+      maze,
+      player,
+      flashlight || undefined,
+      shakeDirection,
+      items
+    );
+  }, [maze, player, flashlight, items]);
 
   return (
     <canvas

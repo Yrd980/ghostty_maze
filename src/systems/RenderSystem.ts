@@ -1,5 +1,6 @@
-import type { Maze, Player, Flashlight } from '../types/game.types';
-import { MAZE_CONFIG, RENDER_CONFIG } from '../constants/game.constants';
+import type { Maze, Player, Flashlight, Item } from '../types/game.types';
+import { ItemType } from '../types/game.types';
+import { MAZE_CONFIG, RENDER_CONFIG, ITEM_CONFIG } from '../constants/game.constants';
 
 export class RenderSystem {
   private ctx: CanvasRenderingContext2D;
@@ -211,16 +212,83 @@ export class RenderSystem {
   }
 
   /**
+   * 渲染道具
+   */
+  renderItems(items: Item[]): void {
+    const size = ITEM_CONFIG.ITEM_SIZE;
+
+    for (const item of items) {
+      if (item.isCollected) continue;
+
+      const { position, type } = item;
+
+      // 根据道具类型选择颜色和图标
+      let color = '#ffffff';
+      let symbol = '?';
+
+      switch (type) {
+        case ItemType.BATTERY:
+          color = '#4affff';  // 青色
+          symbol = '🔋';
+          break;
+        case ItemType.MEDKIT:
+          color = '#ff4444';  // 红色
+          symbol = '💊';
+          break;
+        case ItemType.KEY:
+          color = '#ffff44';  // 黄色
+          symbol = '🔑';
+          break;
+        case ItemType.JAMMER:
+          color = '#ff44ff';  // 紫色
+          symbol = '📻';
+          break;
+      }
+
+      // 绘制道具背景圆
+      this.ctx.fillStyle = color;
+      this.ctx.globalAlpha = 0.3;
+      this.ctx.beginPath();
+      this.ctx.arc(position.x, position.y, size, 0, Math.PI * 2);
+      this.ctx.fill();
+      this.ctx.globalAlpha = 1.0;
+
+      // 绘制道具图标（使用emoji）
+      this.ctx.font = `${size * 1.5}px Arial`;
+      this.ctx.textAlign = 'center';
+      this.ctx.textBaseline = 'middle';
+      this.ctx.fillText(symbol, position.x, position.y);
+
+      // 添加发光效果
+      this.ctx.shadowBlur = 8;
+      this.ctx.shadowColor = color;
+      this.ctx.fillText(symbol, position.x, position.y);
+      this.ctx.shadowBlur = 0;
+    }
+
+    // 重置文本对齐
+    this.ctx.textAlign = 'start';
+    this.ctx.textBaseline = 'alphabetic';
+  }
+
+  /**
    * 完整渲染管线
    */
   render(
     maze: Maze,
     player: Player,
     flashlight?: Flashlight,
-    shakeDirection?: number
+    shakeDirection?: number,
+    items?: Item[]
   ): void {
     this.clear();
     this.renderMaze(maze);
+
+    // 渲染道具
+    if (items) {
+      this.renderItems(items);
+    }
+
     this.renderPlayer(player);
 
     // 渲染手电筒（如果提供）
