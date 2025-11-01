@@ -2,10 +2,12 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { GameCanvas } from './GameCanvas';
 import { HeartRateDisplay } from './UI/HeartRateDisplay';
 import { DebugPanel } from './UI/DebugPanel';
+import { BatteryDisplay } from './UI/BatteryDisplay';
 import { MazeGenerator } from '../systems/MazeGenerator';
 import { CollisionSystem } from '../systems/CollisionSystem';
+import { FlashlightController } from '../managers/FlashlightController';
 import { useKeyboard } from '../hooks/useKeyboard';
-import type { Maze, Player } from '../types/game.types';
+import type { Maze, Player, Flashlight } from '../types/game.types';
 import { PLAYER_CONFIG, HEARTRATE_CONFIG } from '../constants/game.constants';
 
 export function Game() {
@@ -21,10 +23,13 @@ export function Game() {
   });
   const [fps, setFps] = useState(60);
   const [bpm, setBpm] = useState(HEARTRATE_CONFIG.BASE_BPM);
+  const [flashlight, setFlashlight] = useState<Flashlight | null>(null);
 
   const keysRef = useKeyboard();
   const lastTimeRef = useRef<number>(0);
   const fpsCounterRef = useRef({ frames: 0, lastTime: 0 });
+  const flashlightControllerRef = useRef<FlashlightController | null>(null);
+  const lastFlashlightKeyRef = useRef(false);
 
   // 生成迷宫
   const generateMaze = useCallback(() => {
@@ -42,6 +47,10 @@ export function Game() {
   // 初始化
   useEffect(() => {
     generateMaze();
+
+    // 初始化手电筒控制器
+    flashlightControllerRef.current = new FlashlightController();
+    setFlashlight(flashlightControllerRef.current.getState());
   }, [generateMaze]);
 
   // 游戏循环
@@ -146,6 +155,19 @@ export function Game() {
         return prevBpm + (targetBpm - prevBpm) * deltaTime * 2;
       });
 
+      // 处理手电筒开关（F键）
+      const currentFlashlightKey = keysRef.current.flashlight;
+      if (currentFlashlightKey && !lastFlashlightKeyRef.current) {
+        flashlightControllerRef.current?.toggle();
+      }
+      lastFlashlightKeyRef.current = currentFlashlightKey;
+
+      // 更新手电筒状态
+      if (flashlightControllerRef.current) {
+        flashlightControllerRef.current.update(deltaTime, bpm);
+        setFlashlight(flashlightControllerRef.current.getState());
+      }
+
       animationId = requestAnimationFrame(gameLoop);
     };
 
@@ -172,6 +194,13 @@ export function Game() {
       <div className="flex gap-4 items-center">
         <HeartRateDisplay bpm={Math.round(bpm)} />
 
+        {flashlight && (
+          <BatteryDisplay
+            percentage={flashlightControllerRef.current?.getBatteryPercentage() || 0}
+            isOn={flashlight.isOn}
+          />
+        )}
+
         <div className="flex gap-2">
           <div className="bg-horror-dark px-4 py-2 rounded horror-border">
             <div className="text-xs text-horror-gray mb-1">Health</div>
@@ -196,7 +225,7 @@ export function Game() {
       </div>
 
       {/* 游戏画布 */}
-      <GameCanvas maze={maze} player={player} />
+      <GameCanvas maze={maze} player={player} flashlight={flashlight} />
 
       {/* 控制按钮 */}
       <div className="flex gap-4">
@@ -217,7 +246,7 @@ export function Game() {
         <div className="text-horror-gray space-y-1">
           <div>WASD / Arrows - Move</div>
           <div>Shift - Sprint</div>
-          <div>F - Flashlight (TBD)</div>
+          <div>F - Toggle Flashlight</div>
         </div>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import type { Maze, Player } from '../types/game.types';
+import type { Maze, Player, Flashlight } from '../types/game.types';
 import { MAZE_CONFIG, RENDER_CONFIG } from '../constants/game.constants';
 
 export class RenderSystem {
@@ -144,11 +144,88 @@ export class RenderSystem {
   }
 
   /**
+   * 渲染手电筒光照
+   */
+  renderFlashlight(
+    player: Player,
+    flashlight: Flashlight,
+    shakeDirection: number
+  ): void {
+    if (!flashlight.isOn) return;
+
+    const { position } = player;
+    const angleRad = (flashlight.angle / 2) * (Math.PI / 180);
+
+    // 创建径向渐变光照
+    const gradient = this.ctx.createRadialGradient(
+      position.x,
+      position.y,
+      0,
+      position.x,
+      position.y,
+      flashlight.range
+    );
+
+    gradient.addColorStop(0, `rgba(255, 255, 200, ${flashlight.brightness})`);
+    gradient.addColorStop(
+      0.5,
+      `rgba(255, 255, 180, ${flashlight.brightness * 0.5})`
+    );
+    gradient.addColorStop(1, 'rgba(255, 255, 150, 0)');
+
+    // 保存当前状态
+    this.ctx.save();
+
+    // 绘制圆锥形光照区域
+    this.ctx.beginPath();
+    this.ctx.moveTo(position.x, position.y);
+
+    // 圆锥左边缘
+    const leftAngle = shakeDirection - angleRad;
+    this.ctx.lineTo(
+      position.x + Math.cos(leftAngle) * flashlight.range,
+      position.y + Math.sin(leftAngle) * flashlight.range
+    );
+
+    // 圆弧
+    this.ctx.arc(
+      position.x,
+      position.y,
+      flashlight.range,
+      leftAngle,
+      shakeDirection + angleRad
+    );
+
+    // 圆锥右边缘
+    this.ctx.lineTo(position.x, position.y);
+    this.ctx.closePath();
+
+    // 使用混合模式创建光照效果
+    this.ctx.globalCompositeOperation = 'lighter';
+    this.ctx.fillStyle = gradient;
+    this.ctx.fill();
+
+    // 恢复状态
+    this.ctx.globalCompositeOperation = 'source-over';
+    this.ctx.restore();
+  }
+
+  /**
    * 完整渲染管线
    */
-  render(maze: Maze, player: Player): void {
+  render(
+    maze: Maze,
+    player: Player,
+    flashlight?: Flashlight,
+    shakeDirection?: number
+  ): void {
     this.clear();
     this.renderMaze(maze);
     this.renderPlayer(player);
+
+    // 渲染手电筒（如果提供）
+    if (flashlight && shakeDirection !== undefined) {
+      this.renderFlashlight(player, flashlight, shakeDirection);
+    }
   }
 }

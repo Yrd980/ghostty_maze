@@ -50,3 +50,15 @@ export interface KeyboardInput {
   sprint: boolean;
   flashlight: boolean;
 }
+
+// 手电筒状态
+export interface Flashlight {
+  isOn: boolean;
+  angle: number;           // 圆锥角度（度）
+  range: number;           // 照射距离（像素）
+  brightness: number;      // 亮度 (0-1)
+  battery: number;         // 电池电量 (0-100)
+  maxBattery: number;      // 最大电量
+  drainRate: number;       // 消耗速度（每秒）
+  shake: number;           // 当前抖动角度
+}

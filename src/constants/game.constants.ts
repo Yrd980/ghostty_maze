@@ -35,6 +35,18 @@ export const HEARTRATE_CONFIG = {
   MAX_BPM: 150,
 };
 
+// 手电筒配置
+export const FLASHLIGHT_CONFIG = {
+  ANGLE: 90,              // 圆锥角度（度）
+  RANGE: 150,             // 照射距离（像素）
+  BRIGHTNESS: 0.8,        // 亮度
+  MAX_BATTERY: 100,       // 最大电量
+  DRAIN_RATE: 10,         // 消耗速度（每秒）
+  // 心率驱动抖动
+  SHAKE_BPM_THRESHOLD: 80,  // 开始抖动的心率阈值
+  SHAKE_MAX: 8,             // 最大抖动角度
+};
+
 // Canvas 配置
 export const CANVAS_CONFIG = {
   WIDTH: MAZE_CONFIG.WIDTH * MAZE_CONFIG.CELL_SIZE,
