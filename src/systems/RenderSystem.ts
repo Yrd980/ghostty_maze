@@ -19,10 +19,11 @@ export class RenderSystem {
 
   /**
    * 渲染迷宫
+   * WALLS COMMENTED OUT - Only darkness visible, walls hidden for better horror atmosphere
    */
   renderMaze(maze: Maze): void {
     const { cells, cellSize } = maze;
-    const wallThickness = MAZE_CONFIG.WALL_THICKNESS;
+    // const wallThickness = MAZE_CONFIG.WALL_THICKNESS; // Commented out with walls
 
     // 绘制通道（背景）
     this.ctx.fillStyle = RENDER_CONFIG.PATH_COLOR;
@@ -37,62 +38,62 @@ export class RenderSystem {
       }
     }
 
-    // 绘制墙壁
-    this.ctx.strokeStyle = RENDER_CONFIG.WALL_BORDER_COLOR;
-    this.ctx.fillStyle = RENDER_CONFIG.WALL_COLOR;
-    this.ctx.lineWidth = 1;
+    // 绘制墙壁 - COMMENTED OUT for pure darkness effect
+    // this.ctx.strokeStyle = RENDER_CONFIG.WALL_BORDER_COLOR;
+    // this.ctx.fillStyle = RENDER_CONFIG.WALL_COLOR;
+    // this.ctx.lineWidth = 1;
 
-    for (let y = 0; y < cells.length; y++) {
-      for (let x = 0; x < cells[y].length; x++) {
-        const cell = cells[y][x];
-        const px = x * cellSize;
-        const py = y * cellSize;
+    // for (let y = 0; y < cells.length; y++) {
+    //   for (let x = 0; x < cells[y].length; x++) {
+    //     const cell = cells[y][x];
+    //     const px = x * cellSize;
+    //     const py = y * cellSize;
 
-        // 绘制顶部墙壁
-        if (cell.walls.top) {
-          this.ctx.fillRect(px, py, cellSize, wallThickness);
-          this.ctx.strokeRect(px, py, cellSize, wallThickness);
-        }
+    //     // 绘制顶部墙壁
+    //     if (cell.walls.top) {
+    //       this.ctx.fillRect(px, py, cellSize, wallThickness);
+    //       this.ctx.strokeRect(px, py, cellSize, wallThickness);
+    //     }
 
-        // 绘制右侧墙壁
-        if (cell.walls.right) {
-          this.ctx.fillRect(
-            px + cellSize - wallThickness,
-            py,
-            wallThickness,
-            cellSize
-          );
-          this.ctx.strokeRect(
-            px + cellSize - wallThickness,
-            py,
-            wallThickness,
-            cellSize
-          );
-        }
+    //     // 绘制右侧墙壁
+    //     if (cell.walls.right) {
+    //       this.ctx.fillRect(
+    //         px + cellSize - wallThickness,
+    //         py,
+    //         wallThickness,
+    //         cellSize
+    //       );
+    //       this.ctx.strokeRect(
+    //         px + cellSize - wallThickness,
+    //         py,
+    //         wallThickness,
+    //         cellSize
+    //       );
+    //     }
 
-        // 绘制底部墙壁
-        if (cell.walls.bottom) {
-          this.ctx.fillRect(
-            px,
-            py + cellSize - wallThickness,
-            cellSize,
-            wallThickness
-          );
-          this.ctx.strokeRect(
-            px,
-            py + cellSize - wallThickness,
-            cellSize,
-            wallThickness
-          );
-        }
+    //     // 绘制底部墙壁
+    //     if (cell.walls.bottom) {
+    //       this.ctx.fillRect(
+    //         px,
+    //         py + cellSize - wallThickness,
+    //         cellSize,
+    //         wallThickness
+    //       );
+    //       this.ctx.strokeRect(
+    //         px,
+    //         py + cellSize - wallThickness,
+    //         cellSize,
+    //         wallThickness
+    //       );
+    //     }
 
-        // 绘制左侧墙壁
-        if (cell.walls.left) {
-          this.ctx.fillRect(px, py, wallThickness, cellSize);
-          this.ctx.strokeRect(px, py, wallThickness, cellSize);
-        }
-      }
-    }
+    //     // 绘制左侧墙壁
+    //     if (cell.walls.left) {
+    //       this.ctx.fillRect(px, py, wallThickness, cellSize);
+    //       this.ctx.strokeRect(px, py, wallThickness, cellSize);
+    //     }
+    //   }
+    // }
 
     // 不再绘制固定的起点和终点标记
     // 玩家每次随机生成位置
