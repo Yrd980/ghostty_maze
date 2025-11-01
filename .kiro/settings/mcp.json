@@ -1,0 +1,29 @@
+{
+  "mcpServers": {
+    "fetch": {
+      "command": "uvx",
+      "args": [
+        "mcp-server-fetch"
+      ],
+      "env": {},
+      "disabled": true,
+      "autoApprove": []
+    },
+    "chrome-devtools": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "chrome-devtools-mcp@latest",
+        "--chrome-path",
+        "C:\\Users\\Yrd98\\scoop\\apps\\googlechrome\\141.0.7390.66\\chrome.exe"
+      ],
+      "env": {
+        "CHROME_PATH": "C:\\Users\\Yrd98\\scoop\\apps\\googlechrome\\141.0.7390.66\\chrome.exe"
+      },
+      "disabled": false,
+      "autoApprove": [
+        "*"
+      ]
+    }
+  }
+}

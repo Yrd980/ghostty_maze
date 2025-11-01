@@ -53,8 +53,8 @@ export function DebugPanel({ player, fps = 60 }: DebugPanelProps) {
             <span className="text-white">{player.health}</span>
           </div>
           <div className="flex justify-between ml-2">
-            <span>Stamina:</span>
-            <span className="text-white">{player.stamina.toFixed(0)}</span>
+            <span>Luck:</span>
+            <span className="text-yellow-400">{player.luck.toFixed(0)} 🍀</span>
           </div>
           <div className="flex justify-between ml-2">
             <span>Moving:</span>

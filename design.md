@@ -210,11 +210,11 @@ renderToBuffer() → applyDistortion() → renderToScreen()
 
 | 控制 | 功能 |
 |------|------|
-| WASD / 方向键 | 8方向移动 |
-| Shift | 奔跑（消耗体力） |
-| Ctrl | 蹲伏（降低被发现概率 -50%） |
-| 1-4 数字键 | 使用道具栏物品 |
+| WASD / 方向键 | 8方向移动（可穿墙） |
+| Shift | 奔跑（无体力限制） |
 | F | 手电筒开关 |
+
+**注意**: 墙壁碰撞已移除，玩家可以自由穿过迷宫墙壁，提升探索体验。
 
 #### 生存系统
 
@@ -580,21 +580,9 @@ difficulty = {
 
 ### 碰撞检测
 
-使用 AABB（轴对齐包围盒）检测：
+**墙壁碰撞已移除** - 玩家可以自由穿过墙壁，提升游戏体验和探索自由度。
 
-```typescript
-function checkCollision(player: Circle, wall: Rect): boolean {
-  // 找到矩形上最近的点
-  const closestX = clamp(player.x, wall.x, wall.x + wall.width);
-  const closestY = clamp(player.y, wall.y, wall.y + wall.height);
-
-  // 计算距离
-  const dx = player.x - closestX;
-  const dy = player.y - closestY;
-
-  return (dx * dx + dy * dy) < (player.radius * player.radius);
-}
-```
+碰撞检测代码已注释保留在 `CollisionSystem.ts` 中，可在未来需要时重新启用。
 
 ### A* 寻路算法（敌人用）
 
@@ -694,33 +682,35 @@ function getNearbyEntities(entity: Entity): Entity[] {
 
 ### Phase 1: 核心原型（已完成）
 - ✅ 迷宫生成
-- ✅ 玩家移动和碰撞
+- ✅ 玩家移动（墙壁碰撞已移除）
 - ✅ 基础 UI（心率显示、Debug面板）
-- ✅ 心率模拟（简单版）
+- ✅ 心率模拟
 
-### Phase 2: 游戏机制（进行中）
-- ⬜ 手电筒系统
-- ⬜ 道具系统
-- ⬜ 生命值/体力系统
-- ⬜ 敌人 AI（简单巡逻）
+### Phase 2: 游戏机制（已完成）
+- ✅ 手电筒系统
+- ✅ 道具系统（12种收藏品）
+- ✅ 生命值/理智值/运气值系统
+- ✅ 敌人 AI（4个幽灵）
+- ✅ 随机事件系统
 
-### Phase 3: 视觉增强
-- ⬜ 心率驱动视觉扭曲
-- ⬜ 光照系统优化
-- ⬜ 粒子效果
-- ⬜ 屏幕抖动
+### Phase 3: 视觉增强（已完成）
+- ✅ 理智值驱动视觉扭曲
+- ✅ 迷雾系统
+- ✅ 场景转换动画
+- ✅ 心率驱动手电筒抖动
 
-### Phase 4: 音频系统
-- ⬜ 环境音
-- ⬜ 心跳声同步
-- ⬜ 脚步声
-- ⬜ 3D 空间音效
+### Phase 4: 音频系统（已完成）
+- ✅ 动态BGM
+- ✅ 心率驱动音效
+- ✅ 场景特定音乐
+- ✅ 理智值音效扭曲
 
-### Phase 5: 平衡与优化
-- ⬜ 难度调整
-- ⬜ 性能优化
-- ⬜ Bug 修复
-- ⬜ 用户测试
+### Phase 5: 游戏玩法（已完成）
+- ✅ 场景转换系统（5种场景）
+- ✅ 随机出生点
+- ✅ 胜利条件（逃脱传送门）
+- ✅ 失败条件（生命值归零）
+- ✅ 移除墙壁限制（提升体验）
 
 ---
 

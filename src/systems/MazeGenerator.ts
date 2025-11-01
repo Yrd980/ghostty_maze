@@ -24,15 +24,25 @@ export class MazeGenerator {
     const startY = 0;
     this.recursiveBacktrack(cells, startX, startY);
 
-    // 设置起点和终点
+    // 设置随机起点和终点
+    const randomStartX = Math.floor(Math.random() * this.width);
+    const randomStartY = Math.floor(Math.random() * this.height);
+    
     const startPos: Vector2 = {
-      x: startX * this.cellSize + this.cellSize / 2,
-      y: startY * this.cellSize + this.cellSize / 2,
+      x: randomStartX * this.cellSize + this.cellSize / 2,
+      y: randomStartY * this.cellSize + this.cellSize / 2,
     };
 
+    // 终点也随机，但确保不与起点重合
+    let randomEndX, randomEndY;
+    do {
+      randomEndX = Math.floor(Math.random() * this.width);
+      randomEndY = Math.floor(Math.random() * this.height);
+    } while (randomEndX === randomStartX && randomEndY === randomStartY);
+
     const endPos: Vector2 = {
-      x: (this.width - 1) * this.cellSize + this.cellSize / 2,
-      y: (this.height - 1) * this.cellSize + this.cellSize / 2,
+      x: randomEndX * this.cellSize + this.cellSize / 2,
+      y: randomEndY * this.cellSize + this.cellSize / 2,
     };
 
     return {

@@ -23,9 +23,25 @@ export class ItemSystem {
       this.spawnItem(ItemTypeEnum.MEDKIT, maze);
     }
 
-    // 生成钥匙
-    for (let i = 0; i < ITEM_CONFIG.KEY_COUNT; i++) {
-      this.spawnItem(ItemTypeEnum.KEY, maze);
+    // 生成收藏品/物种
+    const speciesTypes = [
+      ItemTypeEnum.ANCIENT_COIN,
+      ItemTypeEnum.CRYSTAL,
+      ItemTypeEnum.SKULL,
+      ItemTypeEnum.BOOK,
+      ItemTypeEnum.POTION,
+      ItemTypeEnum.ARTIFACT,
+      ItemTypeEnum.MUSHROOM,
+      ItemTypeEnum.FEATHER,
+      ItemTypeEnum.STONE,
+      ItemTypeEnum.FLOWER,
+      ItemTypeEnum.EYE,
+      ItemTypeEnum.TOOTH,
+    ];
+
+    for (let i = 0; i < ITEM_CONFIG.SPECIES_COUNT; i++) {
+      const randomType = speciesTypes[Math.floor(Math.random() * speciesTypes.length)];
+      this.spawnItem(randomType, maze);
     }
 
     return this.items;
@@ -34,7 +50,7 @@ export class ItemSystem {
   /**
    * 在迷宫随机位置生成道具
    */
-  private spawnItem(type: ItemType, maze: Maze): void {
+  spawnItem(type: ItemType, maze: Maze, isFake: boolean = false): void {
     const position = this.getRandomValidPosition(maze);
 
     const item: Item = {
@@ -42,9 +58,20 @@ export class ItemSystem {
       type,
       position,
       isCollected: false,
+      isFake,
     };
 
     this.items.push(item);
+  }
+
+  /**
+   * 根据运气值生成道具（可能是假的）
+   */
+  generateItemWithLuck(type: ItemType, maze: Maze, luck: number): void {
+    // 运气越低，越容易生成假道具
+    const fakeChance = Math.max(0, (100 - luck) / 100 * 0.3); // 最高30%假道具率
+    const isFake = Math.random() < fakeChance;
+    this.spawnItem(type, maze, isFake);
   }
 
   /**
